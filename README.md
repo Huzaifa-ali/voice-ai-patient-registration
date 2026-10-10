@@ -29,11 +29,16 @@ The voice layer is [**Vapi**](https://vapi.ai) (phone number, speech-to-text, te
 | | |
 |---|---|
 | ☎️ **Phone number** | `+1 (864) 625-5296` |
-| 🌐 **API base URL** | `<set after deploy>` · locally `http://localhost:8000/api/v1` |
-| 📊 **Dashboard** | `<set after deploy>` · locally `http://localhost:8000/` |
+| 🌐 **API base URL** | `https://238f-110-38-240-147.ngrok-free.app/api/v1` · locally `http://localhost:8000/api/v1` |
+| 📊 **Dashboard** | `https://238f-110-38-240-147.ngrok-free.app/` · locally `http://localhost:8000/` |
 | 📘 **Interactive API docs** | `/docs` (Swagger UI) |
 
-> The phone number is bound to a live Vapi assistant whose webhook points at the deployed backend. During local development the webhook is exposed via ngrok.
+> **Hosting note:** the backend runs locally behind an **ngrok** HTTPS tunnel (the common
+> free PaaS hosts all require a credit card in 2026). The tunnel is live during review
+> windows; if a URL is unreachable, run it locally in ~2 minutes — identical behaviour,
+> same phone number. See **[DEPLOYMENT.md](DEPLOYMENT.md)** for the full rationale, live
+> checks, and the one-command local setup. The app is cloud-ready (Postgres + `railway.json`
+> / `render.yaml` included) — moving to a paid host is a 5-minute change.
 
 ---
 
