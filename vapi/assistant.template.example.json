@@ -16,8 +16,8 @@
     "voiceId": "Elliot"
   },
   "model": {
-    "provider": "google",
-    "model": "gemini-2.5-flash",
+    "provider": "openai",
+    "model": "gpt-4o-mini",
     "temperature": 0.4,
     "messages": [
       {

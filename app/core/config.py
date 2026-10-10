@@ -39,6 +39,10 @@ class Settings(BaseSettings):
     # Shared secret matched against the header Vapi sends on tool calls. Blank
     # disables the check (local dev only).
     VAPI_WEBHOOK_SECRET: str = ""
+    # When True, a missing secret header is rejected. When False (default), a
+    # missing header is allowed (Vapi sometimes doesn't forward tool secrets);
+    # a *wrong* header is always rejected regardless.
+    VAPI_WEBHOOK_STRICT: bool = False
 
     # ── Server ──
     HOST: str = "0.0.0.0"
