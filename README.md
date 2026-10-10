@@ -276,7 +276,7 @@ uv run python vapi/push_tools.py        # register the two tools + attach by id
 
 ## Deployment
 
-The repo ships a Render blueprint (`render.yaml`), a `Procfile`, and `runtime.txt`.
+The repo ships deploy configs for **Railway** (`railway.json`) and Render (`render.yaml`), plus a `Procfile`.
 
 ```
 build:  uv sync
@@ -284,9 +284,21 @@ start:  uv run uvicorn app.main:app --host 0.0.0.0 --port $PORT
 health: /health
 ```
 
-Set `VAPI_WEBHOOK_SECRET` (and, for durable storage, `DATABASE_URL`) in the host's dashboard, then point the Vapi assistant's server URL at `https://<your-host>/api/v1/voice/vapi` and re-push.
+### Railway (recommended)
 
-> **SQLite on an ephemeral filesystem:** on free tiers the file may not survive redeploys — attach a persistent disk or set `DATABASE_URL` to Postgres. For local webhook exposure without deploying, use `ngrok http 8000`.
+1. Create a project from this GitHub repo (Railway auto-detects Python + uv via Nixpacks).
+2. Add a **PostgreSQL** service to the project. Railway injects a `DATABASE_URL` — the app
+   normalizes `postgres://` / `postgresql://` to the psycopg driver automatically, so no edit is needed.
+3. Set `VAPI_WEBHOOK_SECRET` in the service variables (same value as the Vapi tool secret).
+4. Deploy. Railway gives a public URL like `https://<app>.up.railway.app`:
+   - **API base URL** → `https://<app>.up.railway.app/api/v1`
+   - **Dashboard** → `https://<app>.up.railway.app/`
+   - **Vapi webhook** → `https://<app>.up.railway.app/api/v1/voice/vapi`
+5. Point the Vapi assistant's server URL at the webhook and re-push (`vapi/push_assistant.py`).
+
+> **Database durability:** use the Railway Postgres service (above) so data survives
+> redeploys. A bare SQLite file on an ephemeral host would be wiped on each deploy.
+> For local webhook exposure without deploying, use `ngrok http 8000`.
 
 ---
 

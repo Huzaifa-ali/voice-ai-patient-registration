@@ -22,14 +22,15 @@ from app.core.config import settings
 
 # SQLite needs ``check_same_thread=False`` so a connection can be used across
 # FastAPI's threadpool. Harmless/ignored for other engines.
+_db_url = settings.sqlalchemy_url
 _connect_args = (
     {"check_same_thread": False}
-    if settings.DATABASE_URL.startswith("sqlite")
+    if _db_url.startswith("sqlite")
     else {}
 )
 
 engine = create_engine(
-    settings.DATABASE_URL,
+    _db_url,
     connect_args=_connect_args,
     pool_pre_ping=True,
 )

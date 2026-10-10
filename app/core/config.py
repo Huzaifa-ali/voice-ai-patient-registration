@@ -11,6 +11,21 @@ from __future__ import annotations
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+def _normalize_db_url(url: str) -> str:
+    """Make a database URL SQLAlchemy-friendly.
+
+    Managed Postgres hosts (Railway, Render, Heroku) hand out URLs starting with
+    ``postgres://`` or ``postgresql://``. SQLAlchemy needs an explicit driver, so
+    we pin the psycopg (v3) driver. SQLite and already-qualified URLs pass through
+    unchanged.
+    """
+    if url.startswith("postgres://"):
+        url = "postgresql+psycopg://" + url[len("postgres://"):]
+    elif url.startswith("postgresql://"):
+        url = "postgresql+psycopg://" + url[len("postgresql://"):]
+    return url
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore"
@@ -31,6 +46,11 @@ class Settings(BaseSettings):
 
     # ── Observability ──
     LOG_LEVEL: str = "INFO"
+
+    @property
+    def sqlalchemy_url(self) -> str:
+        """The DATABASE_URL normalized for SQLAlchemy (driver pinned for Postgres)."""
+        return _normalize_db_url(self.DATABASE_URL)
 
 
 settings = Settings()
