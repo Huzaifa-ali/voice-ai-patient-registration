@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}{{ p.first_name }} {{ p.last_name }} — Patient{% endblock %}
+
+{% macro field(label, value) %}
+<div class="flex flex-col gap-0.5">
+  <dt class="text-xs uppercase tracking-wide text-slate-400">{{ label }}</dt>
+  <dd class="text-slate-800">{{ value if value else '—' }}</dd>
+</div>
+{% endmacro %}
+
+{% block content %}
+<div class="flex flex-col gap-6">
+
+  <a href="/" class="text-sm text-brand-600 hover:text-brand-700">← Back to all patients</a>
+
+  <!-- Header card -->
+  <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div class="flex items-center gap-4">
+      <span class="inline-flex h-14 w-14 items-center justify-center rounded-full bg-brand-500 text-xl font-bold text-white">
+        {{ p.first_name[0] }}{{ p.last_name[0] }}
+      </span>
+      <div>
+        <h1 class="text-2xl font-bold text-slate-900">{{ p.first_name }} {{ p.last_name }}</h1>
+        <p class="text-sm text-slate-500">Patient ID {{ p.patient_id }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Demographics -->
+  <section class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">Demographics</h2>
+    <dl class="grid grid-cols-2 gap-4 md:grid-cols-3">
+      {{ field('Date of birth', p.date_of_birth) }}
+      {{ field('Sex', p.sex) }}
+      {{ field('Phone', p.phone_number | phone) }}
+      {{ field('Email', p.email) }}
+      {{ field('Preferred language', p.preferred_language) }}
+    </dl>
+  </section>
+
+  <!-- Address -->
+  <section class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">Address</h2>
+    <dl class="grid grid-cols-2 gap-4 md:grid-cols-3">
+      {{ field('Line 1', p.address_line_1) }}
+      {{ field('Line 2', p.address_line_2) }}
+      {{ field('City', p.city) }}
+      {{ field('State', p.state) }}
+      {{ field('ZIP', p.zip_code) }}
+    </dl>
+  </section>
+
+  <!-- Insurance -->
+  <section class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">Insurance</h2>
+    <dl class="grid grid-cols-2 gap-4 md:grid-cols-3">
+      {{ field('Provider', p.insurance_provider) }}
+      {{ field('Member ID', p.insurance_member_id) }}
+    </dl>
+  </section>
+
+  <!-- Emergency contact -->
+  <section class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">Emergency contact</h2>
+    <dl class="grid grid-cols-2 gap-4 md:grid-cols-3">
+      {{ field('Name', p.emergency_contact_name) }}
+      {{ field('Phone', p.emergency_contact_phone | phone if p.emergency_contact_phone else None) }}
+    </dl>
+  </section>
+
+  <!-- Record meta -->
+  <section class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">Record</h2>
+    <dl class="grid grid-cols-2 gap-4 md:grid-cols-3">
+      {{ field('Created (UTC)', p.created_at | datetime) }}
+      {{ field('Updated (UTC)', p.updated_at | datetime) }}
+    </dl>
+  </section>
+
+</div>
+{% endblock %}

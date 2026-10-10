@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Patient Dashboard{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50: '#eff6ff', 500: '#2563eb', 600: '#1d4ed8', 700: '#1e40af' }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+  <header class="bg-white border-b border-slate-200">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2 group">
+        <span class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-brand-500 text-white font-bold">P</span>
+        <div>
+          <div class="font-semibold text-slate-900 group-hover:text-brand-600">Patient Registrations</div>
+          <div class="text-xs text-slate-500">Voice AI intake dashboard</div>
+        </div>
+      </a>
+      <nav class="flex items-center gap-4 text-sm">
+        <a href="/" class="text-slate-600 hover:text-brand-600">Patients</a>
+        <a href="/docs" class="text-slate-600 hover:text-brand-600">API Docs</a>
+        <a href="/health" class="text-slate-600 hover:text-brand-600">Health</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 py-8">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="max-w-6xl mx-auto px-6 py-8 text-xs text-slate-400">
+    Read-only view of the patient database. Records are created by the voice agent or the REST API.
+  </footer>
+</body>
+</html>

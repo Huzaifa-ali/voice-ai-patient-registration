@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Patients — Dashboard{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-6">
+
+  <!-- Header + stats -->
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">Patients</h1>
+      <p class="text-sm text-slate-500 mt-1">
+        {{ patients|length }} record{{ '' if patients|length == 1 else 's' }}
+        {% if query %}matching “{{ query }}”{% else %}on file{% endif %}
+      </p>
+    </div>
+
+    <!-- Search -->
+    <form method="get" action="/" class="flex items-center gap-2">
+      <input
+        type="text" name="q" value="{{ query or '' }}"
+        placeholder="Search name or phone…"
+        class="w-64 rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30 focus:outline-none"
+      >
+      <button type="submit"
+        class="rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600">
+        Search
+      </button>
+      {% if query %}
+      <a href="/" class="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-600 hover:bg-slate-100">Clear</a>
+      {% endif %}
+    </form>
+  </div>
+
+  <!-- Table -->
+  {% if patients %}
+  <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 text-slate-500">
+        <tr>
+          <th class="px-4 py-3 text-left font-medium">Name</th>
+          <th class="px-4 py-3 text-left font-medium">Date of birth</th>
+          <th class="px-4 py-3 text-left font-medium">Sex</th>
+          <th class="px-4 py-3 text-left font-medium">Phone</th>
+          <th class="px-4 py-3 text-left font-medium">Location</th>
+          <th class="px-4 py-3 text-left font-medium">Insurance</th>
+          <th class="px-4 py-3 text-left font-medium">Registered</th>
+          <th class="px-4 py-3"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for p in patients %}
+        <tr class="hover:bg-brand-50/40">
+          <td class="px-4 py-3 font-medium text-slate-900">{{ p.first_name }} {{ p.last_name }}</td>
+          <td class="px-4 py-3 text-slate-600">{{ p.date_of_birth }}</td>
+          <td class="px-4 py-3 text-slate-600">{{ p.sex }}</td>
+          <td class="px-4 py-3 text-slate-600 tabular-nums">{{ p.phone_number | phone }}</td>
+          <td class="px-4 py-3 text-slate-600">{{ p.city }}, {{ p.state }}</td>
+          <td class="px-4 py-3 text-slate-600">{{ p.insurance_provider or '—' }}</td>
+          <td class="px-4 py-3 text-slate-500 text-xs">{{ p.created_at | datetime }}</td>
+          <td class="px-4 py-3 text-right">
+            <a href="/patients/{{ p.patient_id }}"
+               class="text-brand-600 hover:text-brand-700 font-medium">View →</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="rounded-xl border border-dashed border-slate-300 bg-white py-16 text-center">
+    <p class="text-slate-500">
+      {% if query %}No patients match “{{ query }}”.{% else %}No patients registered yet.{% endif %}
+    </p>
+    <p class="text-sm text-slate-400 mt-1">Call the voice agent or POST to <code>/api/v1/patients</code> to add one.</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,181 @@
+{
+  "name": "Patient Intake Coordinator (Avery)",
+  "_notes": "Model is Google gemini-2.5-flash via Vapi: cheapest high-quality option with low latency and reliable function calling (needed for the save_patient/lookup_patient tools). Chosen over DeepSeek/GPT-5-nano which are cheaper per token but less reliable at multi-step tool calling in real-time voice. Swappable in the dashboard. The system prompt is the single source of truth in vapi/system-prompt.md, injected by vapi/build_assistant.py. Server URL and secret are injected from env at build time. No real secrets live in this file.",
+  "firstMessage": "Hi, thanks for calling! I'm Avery, and I'll get you registered as a new patient. It only takes a couple of minutes. To start, what's the best phone number to reach you?",
+  "server": {
+    "url": "https://YOUR-DEPLOYED-HOST/api/v1/voice/vapi",
+    "secret": "REPLACE_WITH_VAPI_WEBHOOK_SECRET"
+  },
+  "transcriber": {
+    "provider": "deepgram",
+    "model": "nova-2",
+    "language": "en"
+  },
+  "voice": {
+    "provider": "vapi",
+    "voiceId": "Elliot"
+  },
+  "model": {
+    "provider": "google",
+    "model": "gemini-2.5-flash",
+    "temperature": 0.4,
+    "messages": [
+      {
+        "role": "system",
+        "content": ""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "lookup_patient",
+          "description": "Check whether an existing patient record matches a phone number, for duplicate detection with returning callers. Call this early, right after collecting the phone number.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "phone_number": {
+                "type": "string",
+                "description": "US 10-digit phone number to look up. Digits only or common formatting; e.g. 5551234567."
+              }
+            },
+            "required": [
+              "phone_number"
+            ]
+          }
+        },
+        "server": {
+          "url": "https://YOUR-DEPLOYED-HOST/api/v1/voice/vapi",
+          "secret": "REPLACE_WITH_VAPI_WEBHOOK_SECRET"
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "save_patient",
+          "description": "Validate and persist a new patient after the caller has confirmed all details. Pass every collected field. On a validation problem the response names the specific field to re-prompt (read it to the caller and re-ask only that field); on success the response confirms the registration.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "first_name": {
+                "type": "string",
+                "description": "Patient's first name. 1-50 characters; letters, hyphens, and apostrophes only.",
+                "minLength": 1,
+                "maxLength": 50
+              },
+              "last_name": {
+                "type": "string",
+                "description": "Patient's last name. 1-50 characters; letters, hyphens, and apostrophes only.",
+                "minLength": 1,
+                "maxLength": 50
+              },
+              "date_of_birth": {
+                "type": "string",
+                "description": "Date of birth in MM/DD/YYYY format (e.g. 03/05/1990). Must not be in the future.",
+                "pattern": "^(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/\\d{4}$"
+              },
+              "sex": {
+                "type": "string",
+                "description": "Patient's sex. Exactly one of the allowed values.",
+                "enum": [
+                  "Male",
+                  "Female",
+                  "Other",
+                  "Decline to Answer"
+                ]
+              },
+              "phone_number": {
+                "type": "string",
+                "description": "US 10-digit phone number. Digits only or common formatting; e.g. 5551234567."
+              },
+              "address_line_1": {
+                "type": "string",
+                "description": "Street address line 1 (number and street).",
+                "minLength": 1
+              },
+              "city": {
+                "type": "string",
+                "description": "City name. 1-100 characters.",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "state": {
+                "type": "string",
+                "description": "2-letter US state abbreviation (e.g. CA, NY, TX).",
+                "minLength": 2,
+                "maxLength": 2,
+                "pattern": "^[A-Za-z]{2}$"
+              },
+              "zip_code": {
+                "type": "string",
+                "description": "US ZIP code: 5 digits or ZIP+4 (e.g. 94105 or 94105-1234).",
+                "pattern": "^\\d{5}(-\\d{4})?$"
+              },
+              "email": {
+                "type": "string",
+                "description": "Optional email address. Must be a valid email if provided.",
+                "format": "email"
+              },
+              "address_line_2": {
+                "type": "string",
+                "description": "Optional address line 2 (apartment, suite, or unit)."
+              },
+              "insurance_provider": {
+                "type": "string",
+                "description": "Optional insurance provider / carrier name."
+              },
+              "insurance_member_id": {
+                "type": "string",
+                "description": "Optional insurance member ID."
+              },
+              "preferred_language": {
+                "type": "string",
+                "description": "Optional preferred language. Defaults to English if not provided.",
+                "default": "English"
+              },
+              "emergency_contact_name": {
+                "type": "string",
+                "description": "Optional emergency contact's full name."
+              },
+              "emergency_contact_phone": {
+                "type": "string",
+                "description": "Optional emergency contact US 10-digit phone number."
+              }
+            },
+            "required": [
+              "first_name",
+              "last_name",
+              "date_of_birth",
+              "sex",
+              "phone_number",
+              "address_line_1",
+              "city",
+              "state",
+              "zip_code"
+            ]
+          }
+        },
+        "server": {
+          "url": "https://YOUR-DEPLOYED-HOST/api/v1/voice/vapi",
+          "secret": "REPLACE_WITH_VAPI_WEBHOOK_SECRET"
+        }
+      }
+    ]
+  },
+  "startSpeakingPlan": {
+    "waitSeconds": 2,
+    "smartEndpointingPlan": {
+      "provider": "livekit"
+    },
+    "transcriptionEndpointingPlan": {
+      "onPunctuationSeconds": 0.3,
+      "onNoPunctuationSeconds": 2.0,
+      "onNumberSeconds": 0.6
+    }
+  },
+  "stopSpeakingPlan": {
+    "numWords": 3,
+    "voiceSeconds": 0.3,
+    "backoffSeconds": 2.0
+  }
+}

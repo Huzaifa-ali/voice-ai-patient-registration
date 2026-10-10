@@ -1,0 +1,43 @@
+# Render Blueprint — free Python web service for the Voice AI Patient Registration API.
+# Docs: https://render.com/docs/blueprint-spec
+#
+# Deploy: push this repo to GitHub, then create a new Blueprint in Render pointing at it.
+# Render reads this file, runs the build/start commands below, and provisions the service.
+services:
+  - type: web
+    name: voice-patient-agent
+    runtime: python
+    plan: free
+    # This project uses `uv` (not pip/requirements.txt). `uv sync` installs from
+    # pyproject.toml + uv.lock into the environment.
+    buildCommand: uv sync
+    # Render injects $PORT; bind to it on all interfaces.
+    startCommand: uv run uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      # SQLAlchemy database URL. Defaults to a local SQLite file.
+      #
+      # ⚠️ Ephemeral-filesystem trade-off: on Render's free plan the filesystem is NOT
+      # persistent, so data written to this SQLite file is LOST on every restart/redeploy.
+      # For durable storage, either:
+      #   (a) attach a persistent disk (paid plans) and point DATABASE_URL at a file on
+      #       its mountPath, e.g. sqlite:///./data/patients.db with a disk mounted at ./data; or
+      #   (b) set DATABASE_URL to a managed Postgres instance
+      #       (e.g. postgresql+psycopg://user:pass@host/db) — the app is engine-agnostic.
+      - key: DATABASE_URL
+        value: sqlite:///./patients.db
+      # Shared secret for the Vapi webhook. Set this in the Render dashboard (not committed);
+      # it must match the `secret` configured on your Vapi tool's server.
+      - key: VAPI_WEBHOOK_SECRET
+        sync: false
+      # Logging verbosity: DEBUG, INFO, WARNING, ERROR.
+      - key: LOG_LEVEL
+        value: INFO
+
+# To make SQLite durable, uncomment a disk mount (requires a paid plan) and set
+# DATABASE_URL above to a path inside mountPath, e.g. sqlite:///./data/patients.db:
+#
+#     disk:
+#       name: patient-data
+#       mountPath: ./data
+#       sizeGB: 1

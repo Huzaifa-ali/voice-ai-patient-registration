@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# Env / secrets
+.env
+*.env
+!.env.example
+
+# uv lockfile (excluded per project preference; note: committing it is usually
+# recommended for reproducible installs)
+uv.lock
+
+# Generated / local Vapi config.
+#   - assistant.json: generated build artifact (contains the live webhook secret
+#     and an environment-specific server URL).
+#   - assistant.template.json: your local working template (may hold a real
+#     server URL/secret once built for your environment).
+# Committed instead: vapi/assistant.template.example.json (placeholders only) +
+# vapi/system-prompt.md. Devs copy the example to assistant.template.json.
+vapi/assistant.json
+vapi/assistant.template.json
+!vapi/assistant.template.example.json
+
+# Database (SQLite) — keep out of git; the app recreates it
+*.db
+*.db-journal
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
