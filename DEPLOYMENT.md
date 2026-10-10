@@ -49,6 +49,11 @@ curl https://238f-110-38-240-147.ngrok-free.app/health
 curl https://238f-110-38-240-147.ngrok-free.app/api/v1/patients
 ```
 
+> **ngrok browser notice:** opening an ngrok free URL in a *browser* first shows a
+> one-time ngrok warning page — click **"Visit Site"** to continue. API clients (curl,
+> Postman, and Vapi's webhook calls) bypass it automatically, so this does not affect the
+> voice agent or programmatic access.
+
 ---
 
 ## Run it yourself (≈2 minutes)
